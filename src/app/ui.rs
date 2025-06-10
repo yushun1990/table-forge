@@ -1,2 +1,2 @@
-mod toolbar;
-mod sidebar;
+pub mod sidebar;
+pub mod toolbar;
