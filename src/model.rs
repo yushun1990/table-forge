@@ -6,6 +6,7 @@ use crate::util::TablePoint;
 pub struct Table {
     pub name: String,
     pub schema: String,
+    pub subject_area: String,
     pub position: TablePoint,
     pub columns: Vec<Column>,
     pub foreign_keys: Vec<ForeignKey>,
@@ -27,4 +28,10 @@ pub struct ForeignKey {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Model {
     pub tables: Vec<Table>,
+}
+
+impl Model {
+    pub fn to_ddl(&self) -> String {
+        String::new()
+    }
 }

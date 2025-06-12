@@ -3,7 +3,7 @@ use iced::{
     mouse::Cursor,
     widget::{
         Canvas,
-        canvas::{self, Frame, Geometry, Program},
+        canvas::{self, Cache, Frame, Geometry, Program},
     },
 };
 
@@ -21,11 +21,30 @@ pub struct Diagram {
 }
 
 impl Diagram {
-    pub fn tables(&self) -> &[Table] {
+    pub fn new(tables: Vec<Table>) -> Self {
+        Diagram {
+            cache: Cache::new(),
+            tables,
+            simplified: true,
+            zoom: 1.0,
+            pan: Point::new(0.0, 0.0),
+            ..Default::default()
+        }
+    }
+
+    pub fn selected_table(&self) -> Option<String> {
+        if let Some(selected_table) = &self.selected_table {
+            Some(selected_table.to_string())
+        } else {
+            None
+        }
+    }
+
+    pub fn tables(&self) -> &Vec<Table> {
         &self.tables
     }
 
-    pub fn tables_mut(&mut self) -> &mut [Table] {
+    pub fn tables_mut(&mut self) -> &mut Vec<Table> {
         &mut self.tables
     }
 
