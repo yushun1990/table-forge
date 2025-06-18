@@ -1,8 +1,10 @@
 pub mod diagram;
 pub mod ui;
 
+use std::sync::Arc;
+
 use diagram::Diagram;
-use iced::{Element, Point, Task, Theme};
+use iced::{Element, Point, Task, Theme, widget::canvas::Cache};
 
 use crate::{
     model::{Model, Table},
@@ -71,6 +73,7 @@ impl TableForge {
                     vec![]
                 },
                 visible: i <= 5,
+                cache: Arc::new(Cache::new()),
             });
         }
         TableForge {
@@ -117,7 +120,7 @@ impl TableForge {
             Message::CanvasEvent(event) => Task::none(),
             Message::ShowContextMenu(position) => {
                 if let Some(table) = self.diagram.selected_table() {
-                    self.context_menu = Some((position, table));
+                    self.context_menu = Some((position, String::from(table)));
                 }
 
                 Task::none()
