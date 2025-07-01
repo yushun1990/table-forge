@@ -1,0 +1,9 @@
+[package]
+name = "table-forge"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+rfd = "0.13"
+iced = { git = "https://github.com/iced-rs/iced", rev = "283d0e7", features = ["highlighter", "canvas", "advanced", "tokio", "svg", "debug"] }
+tokio = { version = "1.0", features = ["fs"] }
