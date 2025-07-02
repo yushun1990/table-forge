@@ -1,39 +1,113 @@
 use iced::{
     Alignment::Center,
-    Element,
+    Color, Element,
     Length::{self, Fill},
     Padding, Point, Rectangle, Renderer, Theme, border, mouse,
-    widget::{button, canvas, center, column, container, svg, tooltip, vertical_space},
+    widget::{Svg, button, canvas, center, column, container, svg, tooltip, vertical_space},
 };
 
-pub struct Sidebar {}
+use crate::utils::{IconStyle, icon};
+
+struct Icon<'a, Message: Clone + 'a> {
+    id: u32,
+    code: char,
+    style: IconStyle<'a, Message>,
+}
+
+pub struct Sidebar<'a, Message: Clone + 'a> {
+    logo: svg::Handle,
+    diagram: Icon<'a, Message>,
+    table: Icon<'a, Message>,
+    database: Icon<'a, Message>,
+    script: Icon<'a, Message>,
+    export: Icon<'a, Message>,
+    help: Icon<'a, Message>,
+}
 
 #[derive(Clone, Debug)]
-pub enum SidebarMessage {}
+pub enum SidebarMessage {
+    Diagram,
+    Table,
+    Database,
+    Script,
+    Export,
+    Help,
+}
 
-impl Sidebar {
+impl<'a> Sidebar<'a, SidebarMessage> {
     pub fn new() -> Self {
-        Self {}
+        let style = IconStyle::new(32.0, 32.0, 0.0);
+        Self {
+            logo: svg::Handle::from_path(format!(
+                "{}/resource/logo.svg",
+                env!("CARGO_MANIFEST_DIR")
+            )),
+            diagram: Icon {
+                id: 1,
+                code: '\u{0efce}',
+                style: style
+                    .clone()
+                    .text_color(Color::from_rgb8(0x50, 0x90, 0xff))
+                    .label("diagram")
+                    .on_press(SidebarMessage::Diagram),
+            },
+            table: Icon {
+                id: 2,
+                code: '\u{f13c8}',
+                style: style.clone().label("table").on_press(SidebarMessage::Table),
+            },
+            database: Icon {
+                id: 3,
+                code: '\u{0eace}',
+                style: style
+                    .clone()
+                    .label("database")
+                    .on_press(SidebarMessage::Database),
+            },
+            script: Icon {
+                id: 4,
+                code: '\u{f0bc1}',
+                style: style
+                    .clone()
+                    .label("script")
+                    .on_press(SidebarMessage::Script),
+            },
+            export: Icon {
+                id: 5,
+                code: '\u{f162c}',
+                style: style
+                    .clone()
+                    .label("export")
+                    .on_press(SidebarMessage::Export),
+            },
+            help: Icon {
+                id: 6,
+                code: '\u{f0625}',
+                style: style.clone().label("help").on_press(SidebarMessage::Help),
+            },
+        }
     }
 
     pub fn update(&mut self, message: SidebarMessage) {}
-    pub fn view<'a>(&self) -> Element<'a, SidebarMessage> {
+    pub fn view(&self) -> Element<'a, SidebarMessage> {
+        let svg: Svg<'a> = svg(self.logo.clone()).width(62).height(62);
         container(
             column![
-                action("logo.svg", 62, 0, "", None),
-                action("diagram.svg", 32, 4, "", None),
-                action("explorer.svg", 32, 4, "", None),
+                button(svg).padding(0),
+                icon(self.diagram.code, self.diagram.style.clone()),
+                icon(self.table.code, self.table.style.clone()),
+                icon(self.database.code, self.database.style.clone()),
                 line(32),
-                action("gen.svg", 32, 4, "", None),
-                action("export.svg", 32, 4, "", None),
+                icon(self.script.code, self.script.style.clone()),
+                icon(self.export.code, self.export.style.clone()),
                 vertical_space(),
-                action("help.svg", 32, 4, "", None)
+                icon(self.help.code, self.help.style.clone()),
             ]
             .spacing(32)
-            .width(62)
+            .width(64)
             .align_x(Center),
         )
-        .style(|theme| {
+        .style(|theme: &Theme| {
             let pallete = theme.extended_palette();
             container::Style::default()
                 .border(border::color(pallete.background.strong.color).width(1))
@@ -42,36 +116,9 @@ impl Sidebar {
     }
 }
 
-fn action<'a, Message: Clone + 'a>(
-    svg_name: &'a str,
-    size: impl Into<Length> + Copy,
-    padding: impl Into<Padding> + Copy,
-    label: &'a str,
-    on_press: Option<Message>,
-) -> Element<'a, Message> {
-    let handle = svg::Handle::from_path(format!(
-        "{}/resource/header/{}",
-        env!("CARGO_MANIFEST_DIR"),
-        svg_name
-    ));
-
-    let content = svg(handle).width(Fill).height(Fill);
-    let action = button(center(content))
-        .width(size)
-        .height(size)
-        .padding(padding);
-    if let Some(on_press) = on_press {
-        tooltip(action.on_press(on_press), label, tooltip::Position::Right)
-            .style(container::rounded_box)
-            .into()
-    } else {
-        action.style(button::secondary).into()
-    }
-}
-
-fn line<'a>(size: impl Into<Length> + Copy) -> Element<'a, SidebarMessage> {
+fn line<'a, Message: Clone + 'a>(size: impl Into<Length> + Copy) -> Element<'a, Message> {
     struct Line;
-    impl canvas::Program<SidebarMessage> for Line {
+    impl<'a, Message> canvas::Program<Message> for Line {
         type State = ();
 
         fn draw(
