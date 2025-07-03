@@ -1,8 +1,6 @@
-use iced::{Alignment::Center, Element, Font, Task, Theme, widget::row};
+use iced::{time::{self, milliseconds}, widget::row, Alignment::Center, Element, Font, Task, Theme};
 use ui::{
-    Sidebar,
-    header::{Header, HeaderMessage},
-    sidebar::SidebarMessage,
+    primary::content::ContentMessage, Primary, PrimaryMessage, Sidebar, SidebarMessage
 };
 
 mod ui;
@@ -13,19 +11,27 @@ fn main() -> iced::Result {
         .theme(TableForge::theme)
         .font(include_bytes!("../resource/font.ttf").as_slice())
         .default_font(Font::MONOSPACE)
+        .subscription(|_| {
+            time::every(milliseconds(50))
+                .map(|_| Message::Primary(
+                    PrimaryMessage::Content(
+                        ContentMessage::Tick
+                    )
+                ))
+        })
         .run()
 }
 
 struct TableForge<'a> {
     theme: Theme,
     sidebar: Sidebar<'a>,
-    header: Header,
+    primary: Primary
 }
 
 #[derive(Clone, Debug)]
 enum Message {
     Sidebar(SidebarMessage),
-    Header(HeaderMessage),
+    Primary(PrimaryMessage)
 }
 
 impl<'a> TableForge<'a> {
@@ -33,21 +39,21 @@ impl<'a> TableForge<'a> {
         Self {
             theme: Theme::Nord,
             sidebar: Sidebar::new(),
-            header: Header::default(),
+            primary: Primary::default(),
         }
     }
 
     fn update(&mut self, message: Message) -> Task<Message> {
         match message {
             Message::Sidebar(message) => self.sidebar.update(message).map(Message::Sidebar),
-            Message::Header(message) => self.header.update(message).map(Message::Header),
+            Message::Primary(message) => self.primary.update(message).map(Message::Primary),
         }
     }
 
     fn view(&self) -> Element<Message> {
         let sidebar = self.sidebar.view().map(Message::Sidebar);
-        let header = self.header.view().map(Message::Header);
-        row![sidebar, header].align_y(Center).into()
+        let primary = self.primary.view().map(Message::Primary);
+        row![sidebar, primary].align_y(Center).into()
     }
 
     fn theme(&self) -> Theme {

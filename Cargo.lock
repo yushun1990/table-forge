@@ -3455,6 +3455,7 @@ name = "table-forge"
 version = "0.1.0"
 dependencies = [
  "iced",
+ "rand",
  "rfd",
  "tf_widget",
  "tokio",

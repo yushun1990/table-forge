@@ -121,8 +121,6 @@ pub fn svg_button<'a, Message: Clone + 'a>(
                 ..button::Style::default()
             };
 
-            println!("button status: {:?}", status);
-
             match status {
                 button::Status::Active => base_style,
                 button::Status::Pressed => button::Style {
