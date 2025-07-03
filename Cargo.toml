@@ -1,9 +1,32 @@
 [package]
 name = "table-forge"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+tf_widget.workspace = true
+
+rfd.workspace = true
+
+iced.workspace = true
+iced.features = ["highlighter", "canvas", "svg", "advanced", "tokio", "debug"]
+
+tokio.workspace = true
+tokio.features = ["fs"]
+
+
+[workspace]
+members = [
+"widget",
+]
+
+[workspace.package]
 version = "0.1.0"
 edition = "2024"
 
-[dependencies]
+[workspace.dependencies]
+tf_widget = { version = "0.1.0", path="widget" }
+
 rfd = "0.13"
-iced = { git = "https://github.com/iced-rs/iced", rev = "283d0e7", features = ["highlighter", "canvas", "advanced", "tokio", "svg", "debug"] }
-tokio = { version = "1.0", features = ["fs"] }
+iced = { git = "https://github.com/iced-rs/iced", rev = "283d0e7" }
+tokio = { version = "1.0" }

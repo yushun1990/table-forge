@@ -1,31 +1,30 @@
 use iced::{
     Alignment::Center,
-    Color, Element,
-    Length::{self, Fill},
-    Padding, Point, Rectangle, Renderer, Theme, border, mouse,
-    widget::{Svg, button, canvas, center, column, container, svg, tooltip, vertical_space},
+    Color, Element, Length, Point, Rectangle, Renderer, Task, Theme, border, mouse,
+    widget::{canvas, column, container, vertical_space},
 };
 
-use crate::utils::{IconStyle, icon};
+use crate::utils::{SvgButtonStyle, svg_button, svg_logo};
 
-struct Icon<'a, Message: Clone + 'a> {
-    id: u32,
-    code: char,
-    style: IconStyle<'a, Message>,
+#[derive(Clone, Debug)]
+struct SvgButton<'a, Message: Clone + 'a> {
+    svg_path: &'a str,
+    style: SvgButtonStyle<'a, Message>,
 }
 
-pub struct Sidebar<'a, Message: Clone + 'a> {
-    logo: svg::Handle,
-    diagram: Icon<'a, Message>,
-    table: Icon<'a, Message>,
-    database: Icon<'a, Message>,
-    script: Icon<'a, Message>,
-    export: Icon<'a, Message>,
-    help: Icon<'a, Message>,
+pub struct Sidebar<'a> {
+    logo: SvgButton<'a, SidebarMessage>,
+    diagram: SvgButton<'a, SidebarMessage>,
+    table: SvgButton<'a, SidebarMessage>,
+    database: SvgButton<'a, SidebarMessage>,
+    script: SvgButton<'a, SidebarMessage>,
+    export: SvgButton<'a, SidebarMessage>,
+    help: SvgButton<'a, SidebarMessage>,
 }
 
 #[derive(Clone, Debug)]
 pub enum SidebarMessage {
+    Logo,
     Diagram,
     Table,
     Database,
@@ -34,77 +33,113 @@ pub enum SidebarMessage {
     Help,
 }
 
-impl<'a> Sidebar<'a, SidebarMessage> {
+impl<'a> Sidebar<'a> {
     pub fn new() -> Self {
-        let style = IconStyle::new(32.0, 32.0, 0.0);
+        let style =
+            SvgButtonStyle::new(32.0, 32.0, 4.0).svg_color(Color::from_rgb8(0x50, 0x90, 0xff));
         Self {
-            logo: svg::Handle::from_path(format!(
-                "{}/resource/logo.svg",
-                env!("CARGO_MANIFEST_DIR")
-            )),
-            diagram: Icon {
-                id: 1,
-                code: '\u{0efce}',
+            logo: SvgButton {
+                svg_path: "logo.svg",
                 style: style
                     .clone()
-                    .text_color(Color::from_rgb8(0x50, 0x90, 0xff))
-                    .label("diagram")
-                    .on_press(SidebarMessage::Diagram),
+                    .width(62.0)
+                    .height(62.0)
+                    .padding(0.0)
+                    .on_press(SidebarMessage::Logo),
             },
-            table: Icon {
-                id: 2,
-                code: '\u{f13c8}',
-                style: style.clone().label("table").on_press(SidebarMessage::Table),
-            },
-            database: Icon {
-                id: 3,
-                code: '\u{0eace}',
+            diagram: SvgButton {
+                svg_path: "sidebar/diagram.svg",
                 style: style
                     .clone()
-                    .label("database")
-                    .on_press(SidebarMessage::Database),
+                    .is_active(true)
+                    .on_press(SidebarMessage::Diagram)
+                    .label("diagram"),
             },
-            script: Icon {
-                id: 4,
-                code: '\u{f0bc1}',
+            table: SvgButton {
+                svg_path: "sidebar/table.svg",
+                style: style.clone().on_press(SidebarMessage::Table).label("table"),
+            },
+            database: SvgButton {
+                svg_path: "sidebar/database.svg",
                 style: style
                     .clone()
-                    .label("script")
-                    .on_press(SidebarMessage::Script),
+                    .on_press(SidebarMessage::Database)
+                    .label("database"),
             },
-            export: Icon {
-                id: 5,
-                code: '\u{f162c}',
+            script: SvgButton {
+                svg_path: "sidebar/script.svg",
                 style: style
                     .clone()
-                    .label("export")
-                    .on_press(SidebarMessage::Export),
+                    .on_press(SidebarMessage::Script)
+                    .label("script"),
             },
-            help: Icon {
-                id: 6,
-                code: '\u{f0625}',
-                style: style.clone().label("help").on_press(SidebarMessage::Help),
+            export: SvgButton {
+                svg_path: "sidebar/export.svg",
+                style: style
+                    .clone()
+                    .on_press(SidebarMessage::Export)
+                    .label("export"),
+            },
+            help: SvgButton {
+                svg_path: "sidebar/help.svg",
+                style: style.clone().on_press(SidebarMessage::Help).label("help"),
             },
         }
     }
 
-    pub fn update(&mut self, message: SidebarMessage) {}
+    pub fn update(&mut self, message: SidebarMessage) -> Task<SidebarMessage> {
+        match message {
+            SidebarMessage::Logo => Task::none(),
+            SidebarMessage::Diagram => {
+                self.inactive();
+                self.diagram.style.active();
+                Task::none()
+            }
+            SidebarMessage::Table => {
+                self.inactive();
+                self.table.style.active();
+                Task::none()
+            }
+            SidebarMessage::Database => {
+                self.inactive();
+                self.database.style.active();
+                Task::none()
+            }
+            SidebarMessage::Script => {
+                self.inactive();
+                self.script.style.active();
+
+                Task::none()
+            }
+            SidebarMessage::Export => {
+                self.inactive();
+                self.export.style.active();
+
+                Task::none()
+            }
+            SidebarMessage::Help => {
+                self.inactive();
+                self.help.style.active();
+
+                Task::none()
+            }
+        }
+    }
     pub fn view(&self) -> Element<'a, SidebarMessage> {
-        let svg: Svg<'a> = svg(self.logo.clone()).width(62).height(62);
         container(
             column![
-                button(svg).padding(0),
-                icon(self.diagram.code, self.diagram.style.clone()),
-                icon(self.table.code, self.table.style.clone()),
-                icon(self.database.code, self.database.style.clone()),
+                svg_logo(self.logo.svg_path, self.logo.style.clone()),
+                svg_button(self.diagram.svg_path, self.diagram.style.clone()),
+                svg_button(self.table.svg_path, self.table.style.clone()),
+                svg_button(self.database.svg_path, self.database.style.clone()),
                 line(32),
-                icon(self.script.code, self.script.style.clone()),
-                icon(self.export.code, self.export.style.clone()),
+                svg_button(self.script.svg_path, self.script.style.clone()),
+                svg_button(self.export.svg_path, self.export.style.clone()),
                 vertical_space(),
-                icon(self.help.code, self.help.style.clone()),
+                svg_button(self.help.svg_path, self.help.style.clone()),
             ]
             .spacing(32)
-            .width(64)
+            .width(62)
             .align_x(Center),
         )
         .style(|theme: &Theme| {
@@ -113,6 +148,15 @@ impl<'a> Sidebar<'a, SidebarMessage> {
                 .border(border::color(pallete.background.strong.color).width(1))
         })
         .into()
+    }
+
+    fn inactive(&mut self) {
+        self.diagram.style.inactive();
+        self.table.style.inactive();
+        self.database.style.inactive();
+        self.script.style.inactive();
+        self.export.style.inactive();
+        self.help.style.inactive();
     }
 }
 

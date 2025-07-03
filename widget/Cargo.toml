@@ -1,0 +1,8 @@
+[package]
+name = "tf_widget"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+iced.workspace = true
+iced.features = ["svg", "advanced"]
