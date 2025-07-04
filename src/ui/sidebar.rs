@@ -1,10 +1,10 @@
 use iced::{
     Alignment::Center,
-    Color, Element, Length, Point, Rectangle, Renderer, Task, Theme, border, mouse,
-    widget::{canvas, column, container, vertical_space},
+    Color, Element, Task, Theme, border,
+    widget::{column, container, vertical_space},
 };
 
-use crate::utils::{SvgButtonStyle, svg_button, svg_logo};
+use crate::utils::{Line, SvgButtonStyle, line, svg_button};
 
 #[derive(Clone, Debug)]
 struct SvgButton<'a, Message: Clone + 'a> {
@@ -42,6 +42,7 @@ impl<'a> Sidebar<'a> {
                 svg_path: "logo.svg",
                 style: style
                     .clone()
+                    .custom_svg_style(false)
                     .width(62.0)
                     .height(62.0)
                     .padding(0.0)
@@ -128,11 +129,15 @@ impl<'a> Sidebar<'a> {
     pub fn view(&self) -> Element<'a, SidebarMessage> {
         container(
             column![
-                svg_logo(self.logo.svg_path, self.logo.style.clone()),
+                svg_button(self.logo.svg_path, self.logo.style.clone()),
                 svg_button(self.diagram.svg_path, self.diagram.style.clone()),
                 svg_button(self.table.svg_path, self.table.style.clone()),
                 svg_button(self.database.svg_path, self.database.style.clone()),
-                line(32),
+                line(Line {
+                    size: 32.0,
+                    thick: 1.0,
+                    angle: 0.0.into()
+                }),
                 svg_button(self.script.svg_path, self.script.style.clone()),
                 svg_button(self.export.svg_path, self.export.style.clone()),
                 vertical_space(),
@@ -158,32 +163,4 @@ impl<'a> Sidebar<'a> {
         self.export.style.inactive();
         self.help.style.inactive();
     }
-}
-
-fn line<'a, Message: Clone + 'a>(size: impl Into<Length> + Copy) -> Element<'a, Message> {
-    struct Line;
-    impl<'a, Message> canvas::Program<Message> for Line {
-        type State = ();
-
-        fn draw(
-            &self,
-            _state: &Self::State,
-            renderer: &Renderer,
-            theme: &Theme,
-            bounds: Rectangle,
-            _cursor: mouse::Cursor,
-        ) -> Vec<canvas::Geometry> {
-            let mut frame = canvas::Frame::new(renderer, bounds.size());
-            let palette = theme.extended_palette();
-            frame.fill_rectangle(
-                Point::ORIGIN,
-                bounds.size(),
-                palette.background.strong.color,
-            );
-
-            vec![frame.into_geometry()]
-        }
-    }
-
-    canvas(Line).width(size).height(1).into()
 }

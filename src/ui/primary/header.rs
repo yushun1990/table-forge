@@ -1,5 +1,8 @@
 use iced::{
-    alignment::Horizontal::Left, widget::{button, center, horizontal_space, row, text}, Alignment::Center, Element, Font, Padding, Task
+    Alignment::Center,
+    Element, Font, Padding, Task,
+    alignment::Horizontal::Left,
+    widget::{button, center, horizontal_space, row, text},
 };
 use title::{Title, TitleMessage};
 
@@ -26,28 +29,87 @@ impl Header {
         const FONT: Font = Font::with_name("JetBrainsMono NF");
         row![
             self.title.view().map(HeaderMessage::Title),
+            button(center(text('\u{0eaf8}').font(FONT).size(20)))
+                .width(32)
+                .height(32)
+                .padding(0),
+            button(center(text('\u{0eaf1}').font(FONT).size(20)))
+                .width(32)
+                .height(32)
+                .padding(0),
+            button(center(text('\u{0eaf1}').font(FONT).size(20)))
+                .width(32)
+                .height(32)
+                .padding(0),
+            button(center(text('\u{0eaf1}').font(FONT).size(20)))
+                .width(32)
+                .height(32)
+                .padding(0),
+            button(center(text('\u{0eaf1}').font(FONT).size(20)))
+                .width(32)
+                .height(32)
+                .padding(0),
+            button(center(text('\u{0eaf1}').font(FONT).size(20)))
+                .width(32)
+                .height(32)
+                .padding(0),
+            button(center(text('\u{0eaf1}').font(FONT).size(20)))
+                .width(32)
+                .height(32)
+                .padding(0),
+            button(center(text('\u{0eaf1}').font(FONT).size(20)))
+                .width(32)
+                .height(32)
+                .padding(0),
+            button(center(text('\u{0eaf1}').font(FONT).size(20)))
+                .width(32)
+                .height(32)
+                .padding(0),
+            button(center(text('\u{0eaf1}').font(FONT).size(20)))
+                .width(32)
+                .height(32)
+                .padding(0),
+            button(center(text('\u{0eaf1}').font(FONT).size(20)))
+                .width(32)
+                .height(32)
+                .padding(0),
+            button(center(text('\u{0eaf1}').font(FONT).size(20)))
+                .width(32)
+                .height(32)
+                .padding(0),
+            button(center(text('\u{0eaf1}').font(FONT).size(20)))
+                .width(32)
+                .height(32)
+                .padding(0),
+            button(center(text('\u{0eaf1}').font(FONT).size(20)))
+                .width(32)
+                .height(32)
+                .padding(0),
+            button(center(text('\u{0eaf1}').font(FONT).size(20)))
+                .width(32)
+                .height(32)
+                .padding(0),
             horizontal_space(),
-            button(center(text('\u{0eaf8}').font(FONT).size(20))).width(32).height(32).padding(0),
-            button(center(text('\u{0eaf1}').font(FONT).size(20))).width(32).height(32).padding(0),
-            button(center(text('\u{0eaf1}').font(FONT).size(20))).width(32).height(32).padding(0),
-            button(center(text('\u{0eaf1}').font(FONT).size(20))).width(32).height(32).padding(0),
-            button(center(text('\u{0eaf1}').font(FONT).size(20))).width(32).height(32).padding(0),
-            button(center(text('\u{0eaf1}').font(FONT).size(20))).width(32).height(32).padding(0),
-            button(center(text('\u{0eaf1}').font(FONT).size(20))).width(32).height(32).padding(0),
-            button(center(text('\u{0eaf1}').font(FONT).size(20))).width(32).height(32).padding(0),
-            button(center(text('\u{0eaf1}').font(FONT).size(20))).width(32).height(32).padding(0),
-            button(center(text('\u{0eaf1}').font(FONT).size(20))).width(32).height(32).padding(0),
-            button(center(text('\u{0eaf1}').font(FONT).size(20))).width(32).height(32).padding(0),
-            button(center(text('\u{0eaf1}').font(FONT).size(20))).width(32).height(32).padding(0),
-            button(center(text('\u{0eaf1}').font(FONT).size(20))).width(32).height(32).padding(0),
-            button(center(text('\u{0eaf1}').font(FONT).size(20))).width(32).height(32).padding(0),
-            button(center(text('\u{0eaf1}').font(FONT).size(20))).width(32).height(32).padding(0),
-            horizontal_space(),
-            button(center(text('\u{0f123}').font(FONT).size(20))).width(32).height(32).padding(0),
-            button(center(text('\u{0f123}').font(FONT).size(20))).width(32).height(32).padding(0),
-            button(center(text('\u{0f123}').font(FONT).size(20))).width(32).height(32).padding(0),
-            button(center(text('\u{0f123}').font(FONT).size(20))).width(32).height(32).padding(0),
-            button(center(text('\u{0f123}').font(FONT).size(20))).width(32).height(32).padding(0),
+            button(center(text('\u{0f123}').font(FONT).size(20)))
+                .width(32)
+                .height(32)
+                .padding(0),
+            button(center(text('\u{0f123}').font(FONT).size(20)))
+                .width(32)
+                .height(32)
+                .padding(0),
+            button(center(text('\u{0f123}').font(FONT).size(20)))
+                .width(32)
+                .height(32)
+                .padding(0),
+            button(center(text('\u{0f123}').font(FONT).size(20)))
+                .width(32)
+                .height(32)
+                .padding(0),
+            button(center(text('\u{0f123}').font(FONT).size(20)))
+                .width(32)
+                .height(32)
+                .padding(0),
         ]
         .spacing(20)
         .padding(Padding::default().right(32))

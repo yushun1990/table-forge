@@ -1,11 +1,10 @@
 use iced::{
-    Background, Color, Element,
-    Length::Fill,
-    Theme,
+    Background, Color, Degrees, Element, Length, Point, Radians, Rectangle, Renderer, Size, Theme,
+    Vector, mouse,
     padding::all,
-    widget::{button, svg},
+    widget::{button, canvas},
 };
-use tf_widget::icon::Icon;
+use tf_widget::{Handle, Svg};
 
 #[derive(Clone, Debug)]
 pub struct SvgButtonStyle<'a, Message: Clone + 'a> {
@@ -15,6 +14,7 @@ pub struct SvgButtonStyle<'a, Message: Clone + 'a> {
     padding: f32,
     label: Option<&'a str>,
     on_press: Option<Message>,
+    custom_svg_style: bool,
     is_active: bool,
 }
 
@@ -27,6 +27,7 @@ impl<'a, Message: Clone + 'a> SvgButtonStyle<'a, Message> {
             padding,
             label: None,
             on_press: None,
+            custom_svg_style: true,
             is_active: false,
         }
     }
@@ -73,21 +74,10 @@ impl<'a, Message: Clone + 'a> SvgButtonStyle<'a, Message> {
     pub fn inactive(&mut self) {
         self.is_active = false;
     }
-}
 
-pub fn svg_logo<'a, Message: Clone + 'a>(
-    svg_path: &'a str,
-    style: SvgButtonStyle<'a, Message>,
-) -> Element<'a, Message> {
-    let svg = svg(get_handle(svg_path));
-    let btn = button(svg)
-        .width(style.btn_width)
-        .height(style.btn_height)
-        .padding(style.padding);
-    if let Some(on_press) = style.on_press {
-        btn.on_press(on_press).into()
-    } else {
-        btn.into()
+    pub fn custom_svg_style(mut self, ok: bool) -> Self {
+        self.custom_svg_style = ok;
+        self
     }
 }
 
@@ -96,8 +86,11 @@ pub fn svg_button<'a, Message: Clone + 'a>(
     style: SvgButtonStyle<'a, Message>,
 ) -> Element<'a, Message> {
     let handle = get_handle(svg_path);
-    let icon = Icon::new(handle).width(Fill).height(Fill);
-    let btn = button(icon)
+    let svg = Svg::new(handle)
+        .using_parent_style(style.custom_svg_style)
+        .width(Length::Fill)
+        .height(Length::Fill);
+    let btn = button(svg)
         .width(style.btn_width)
         .height(style.btn_height)
         .padding(all(style.padding))
@@ -165,8 +158,60 @@ pub fn svg_button<'a, Message: Clone + 'a>(
     }
 }
 
-fn get_handle<'a>(svg_path: &'a str) -> svg::Handle {
-    return svg::Handle::from_path(format!(
+#[derive(Clone, Copy)]
+pub struct Line {
+    pub size: f32,
+    pub thick: f32,
+    pub angle: Degrees,
+}
+impl<'a, Message> canvas::Program<Message> for Line {
+    type State = ();
+
+    fn draw(
+        &self,
+        _state: &Self::State,
+        renderer: &Renderer,
+        theme: &Theme,
+        bounds: Rectangle,
+        _cursor: mouse::Cursor,
+    ) -> Vec<canvas::Geometry> {
+        let mut frame = canvas::Frame::new(renderer, bounds.size());
+
+        let center = frame.center();
+        frame.translate(Vector::new(center.x, center.y));
+
+        let path = canvas::Path::line(
+            Point::new(-bounds.size().width / 2.0, 0.0),
+            Point::new(bounds.size().width / 2.0, 0.0),
+        );
+
+        let palette = theme.extended_palette();
+        frame.rotate(Degrees::from(self.angle));
+        frame.stroke(
+            &path,
+            canvas::Stroke {
+                width: self.thick,
+                style: canvas::stroke::Style::Solid(palette.background.strong.color),
+                line_cap: canvas::LineCap::Round,
+                ..canvas::Stroke::default()
+            },
+        );
+
+        vec![frame.into_geometry()]
+    }
+}
+
+pub fn line<'a, Message: Clone + 'a>(line: Line) -> Element<'a, Message> {
+    let mut height = Radians::from(line.angle).0 * line.size;
+    if height == 0.0 {
+        height = line.thick;
+    }
+
+    canvas(line).width(line.size).height(height).into()
+}
+
+fn get_handle<'a>(svg_path: &'a str) -> Handle {
+    return Handle::from_path(format!(
         "{}/resource/{}",
         env!("CARGO_MANIFEST_DIR"),
         svg_path
