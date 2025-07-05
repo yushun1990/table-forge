@@ -1,13 +1,13 @@
 use std::cell::Cell;
 
 use iced::{
+    widget::{column, text_input},
     Border, Color, Element,
-    Length::{Fill, FillPortion, Shrink},
+    Length::Fill,
     Padding, Task, Theme,
-    widget::{column, container, text_input},
 };
 
-use crate::utils::{self, Line, line};
+use crate::utils::{self, Line};
 
 pub struct Title {
     name: String,
@@ -53,8 +53,8 @@ impl Title {
             .size(20)
             .style(|theme: &Theme, status: text_input::Status| {
                 match status {
-                    text_input::Status::Focused { is_hovered } => {
-                        self.show_name_btm_line.set(!is_hovered);
+                    text_input::Status::Focused { is_hovered: _ } => {
+                        self.show_name_btm_line.set(true);
                     }
                     _ => self.show_name_btm_line.set(false),
                 }
@@ -72,7 +72,6 @@ impl Title {
             .width(Fill)
             .size(12)
             .style(|theme: &Theme, status: text_input::Status| {
-                println!("status : {:?}", status);
                 match status {
                     text_input::Status::Focused { is_hovered: _ } => {
                         self.show_version_btm_line.set(true);
@@ -94,6 +93,7 @@ impl Title {
         let line = Line {
             size: 900.0,
             thick: 1.0,
+            color: Some(Color::from_rgb8(0x50, 0x90, 0xff)),
             angle: 0.0.into(),
         };
 

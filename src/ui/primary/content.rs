@@ -1,98 +1,59 @@
 use std::cell::RefCell;
 
-use iced::{advanced::graphics::futures::backend::default::time, time::milliseconds, widget::canvas, Color, Element, Font, Length::Fill, Point, Renderer, Subscription, Task};
+use iced::{
+    advanced::text,
+    alignment,
+    widget::{canvas, center, container},
+    Element, Font,
+    Length::Fill,
+    Renderer, Task,
+};
 
 #[derive(Default)]
-pub struct Content {
-    tick: usize
-}
+pub struct Content {}
 
 #[derive(Clone, Debug, Copy)]
-pub enum ContentMessage {
-    Tick,
-}
-
+pub enum ContentMessage {}
 
 impl Content {
-    pub fn update(&mut self, message: ContentMessage) -> Task<ContentMessage> {
-        match message {
-            ContentMessage::Tick => {
-                self.tick += 1;
-                Task::none()
-            }
-        }
+    pub fn update(&mut self, _message: ContentMessage) -> Task<ContentMessage> {
+        Task::none()
     }
 
     pub fn view(&self) -> Element<'_, ContentMessage> {
-        canvas(self).width(Fill).height(Fill).into()
+        container(center(canvas(self).width(Fill).height(Fill)))
+            .padding(20)
+            .width(Fill)
+            .height(Fill)
+            .into()
     }
-
-    fn subscription(&self) -> Subscription<ContentMessage> {
-        time::every(milliseconds(50)).map(|_| ContentMessage::Tick)
-    }
-
 }
 
-impl <Message> canvas::Program<Message> for Content {
+impl<Message> canvas::Program<Message> for Content {
     type State = RefCell<Vec<canvas::Cache>>;
 
     fn draw(
         &self,
-        state: &Self::State,
+        _state: &Self::State,
         renderer: &Renderer,
-        _theme: &iced::Theme,
+        theme: &iced::Theme,
         bounds: iced::Rectangle,
-        cursor: iced::advanced::mouse::Cursor,
+        _cursor: iced::advanced::mouse::Cursor,
     ) -> Vec<canvas::Geometry<Renderer>> {
-        use rand::Rng;
-        use rand::distributions::Distribution;
+        let font = Font::with_name("JetBrainsMono NF");
+        let palette = theme.extended_palette();
+        let mut frame = canvas::Frame::new(renderer, bounds.size());
+        frame.fill_text(canvas::Text {
+            content: String::from("Under development..."),
+            size: 64.0.into(),
+            position: frame.center(),
+            color: palette.background.strongest.color,
+            align_x: text::Alignment::Center,
+            align_y: alignment::Vertical::Center,
+            font: font,
+            ..canvas::Text::default()
+        });
 
-        const CELL_SIZE: f32 = 10.0;
-        let mut caches = state.borrow_mut();
-        if caches.is_empty() {
-            let group = canvas::Group::unique();
-            caches.resize_with(30, || canvas::Cache::with_group(group));
-        }
-
-        vec![
-            caches[self.tick % caches.len()].draw(
-                renderer,
-                bounds.size(),
-                |frame| {
-                    frame.fill_rectangle(Point::ORIGIN, frame.size(), Color::BLACK);
-
-                    let mut rng = rand::thread_rng();
-                    let rows = (frame.height() / CELL_SIZE).ceil() as usize;
-                    let cols = (frame.width() / CELL_SIZE).ceil() as usize;
-
-                    for row in 0..rows {
-                        for col in 0..cols {
-                            let position = Point::new(
-                                col as f32 * CELL_SIZE,
-                                row as f32 * CELL_SIZE
-                            );
-
-                            let alphas = [ 0.05, 0.1, 0.2, 0.5];
-                            let weights = [ 10, 4, 2, 1 ];
-                            let distribution = rand::distributions::WeightedIndex::new(weights).expect("Create distribution");
-
-                            frame.fill_text(canvas::Text {
-                                content: rng.gen_range('!'..'z').to_string(),
-                                position,
-                                color: Color {
-                                    a: alphas[distribution.sample(&mut rng)],
-                                    g: 1.0,
-                                    ..Color::BLACK
-                                },
-                                size: CELL_SIZE.into(),
-                                font: Font::MONOSPACE,
-                                ..canvas::Text::default()
-                            });
-
-                        }
-                    }
-                }
-            )
-        ]
+        vec![frame.into_geometry()]
     }
 }

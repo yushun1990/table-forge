@@ -1,10 +1,19 @@
 use iced::{
-    Background, Color, Degrees, Element, Length, Point, Radians, Rectangle, Renderer, Size, Theme,
-    Vector, mouse,
+    mouse,
     padding::all,
     widget::{button, canvas},
+    Background, Color, Degrees, Element, Length, Point, Radians, Rectangle, Renderer, Theme,
+    Vector,
 };
 use tf_widget::{Handle, Svg};
+
+use crate::constants;
+
+#[derive(Clone, Debug)]
+pub struct SvgButton<'a, Message: Clone + 'a> {
+    pub svg_path: &'a str,
+    pub style: SvgButtonStyle<'a, Message>,
+}
 
 #[derive(Clone, Debug)]
 pub struct SvgButtonStyle<'a, Message: Clone + 'a> {
@@ -16,8 +25,10 @@ pub struct SvgButtonStyle<'a, Message: Clone + 'a> {
     on_press: Option<Message>,
     custom_svg_style: bool,
     is_active: bool,
+    disable_background: bool,
 }
 
+#[allow(dead_code)]
 impl<'a, Message: Clone + 'a> SvgButtonStyle<'a, Message> {
     pub fn new(width: f32, height: f32, padding: f32) -> Self {
         SvgButtonStyle {
@@ -29,6 +40,7 @@ impl<'a, Message: Clone + 'a> SvgButtonStyle<'a, Message> {
             on_press: None,
             custom_svg_style: true,
             is_active: false,
+            disable_background: false,
         }
     }
 
@@ -79,6 +91,16 @@ impl<'a, Message: Clone + 'a> SvgButtonStyle<'a, Message> {
         self.custom_svg_style = ok;
         self
     }
+
+    pub fn enable_background(mut self) -> Self {
+        self.disable_background = false;
+        self
+    }
+
+    pub fn disable_background(mut self) -> Self {
+        self.disable_background = true;
+        self
+    }
 }
 
 pub fn svg_button<'a, Message: Clone + 'a>(
@@ -97,11 +119,13 @@ pub fn svg_button<'a, Message: Clone + 'a>(
         .style(move |theme: &Theme, status: button::Status| {
             let palette = theme.extended_palette();
             let base_style = button::Style {
-                background: Some(Background::Color(if style.is_active {
-                    palette.background.weakest.color
-                } else {
-                    palette.background.base.color
-                })),
+                background: Some(Background::Color(
+                    if style.is_active && !style.disable_background {
+                        palette.background.weakest.color
+                    } else {
+                        palette.background.base.color
+                    },
+                )),
                 text_color: if style.is_active {
                     if style.svg_color.is_some() {
                         style.svg_color.unwrap()
@@ -114,10 +138,15 @@ pub fn svg_button<'a, Message: Clone + 'a>(
                 ..button::Style::default()
             };
 
+            let backgroud_color = Some(Background::Color(if style.disable_background {
+                palette.background.base.color
+            } else {
+                palette.background.weakest.color
+            }));
             match status {
                 button::Status::Active => base_style,
                 button::Status::Pressed => button::Style {
-                    background: Some(Background::Color(palette.background.weakest.color)),
+                    background: backgroud_color,
                     text_color: if style.svg_color.is_some() {
                         style.svg_color.unwrap()
                     } else {
@@ -126,14 +155,12 @@ pub fn svg_button<'a, Message: Clone + 'a>(
                     ..base_style
                 },
                 button::Status::Hovered => button::Style {
-                    background: Some(Background::Color(palette.background.weakest.color)),
-                    text_color: Color::from_rgb8(0xf1, 0xf4, 0xf7),
+                    background: backgroud_color,
+                    text_color: constants::ICON_HOVER,
                     ..base_style
                 },
                 button::Status::Disabled => button::Style {
-                    background: base_style
-                        .background
-                        .map(|background| background.scale_alpha(0.5)),
+                    background: Some(Background::Color(palette.background.base.color)),
                     text_color: base_style.text_color.scale_alpha(0.5),
                     ..base_style
                 },
@@ -162,6 +189,7 @@ pub fn svg_button<'a, Message: Clone + 'a>(
 pub struct Line {
     pub size: f32,
     pub thick: f32,
+    pub color: Option<Color>,
     pub angle: Degrees,
 }
 impl<'a, Message> canvas::Program<Message> for Line {
@@ -186,12 +214,16 @@ impl<'a, Message> canvas::Program<Message> for Line {
         );
 
         let palette = theme.extended_palette();
+        let mut color = palette.background.strong.color;
+        if let Some(c) = self.color {
+            color = c;
+        }
         frame.rotate(Degrees::from(self.angle));
         frame.stroke(
             &path,
             canvas::Stroke {
                 width: self.thick,
-                style: canvas::stroke::Style::Solid(palette.background.strong.color),
+                style: canvas::stroke::Style::Solid(color),
                 line_cap: canvas::LineCap::Round,
                 ..canvas::Stroke::default()
             },

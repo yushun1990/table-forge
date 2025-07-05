@@ -1,16 +1,14 @@
 use iced::{
-    Alignment::Center,
-    Color, Element, Task, Theme, border,
+    border,
     widget::{column, container, vertical_space},
+    Alignment::Center,
+    Element, Task, Theme,
 };
 
-use crate::utils::{Line, SvgButtonStyle, line, svg_button};
-
-#[derive(Clone, Debug)]
-struct SvgButton<'a, Message: Clone + 'a> {
-    svg_path: &'a str,
-    style: SvgButtonStyle<'a, Message>,
-}
+use crate::{
+    constants,
+    utils::{line, svg_button, Line, SvgButton, SvgButtonStyle},
+};
 
 pub struct Sidebar<'a> {
     logo: SvgButton<'a, SidebarMessage>,
@@ -35,16 +33,20 @@ pub enum SidebarMessage {
 
 impl<'a> Sidebar<'a> {
     pub fn new() -> Self {
-        let style =
-            SvgButtonStyle::new(32.0, 32.0, 4.0).svg_color(Color::from_rgb8(0x50, 0x90, 0xff));
+        let style = SvgButtonStyle::new(
+            constants::ICON_SIZE,
+            constants::ICON_SIZE,
+            constants::ICON_PADDING,
+        )
+        .svg_color(constants::ICON_ACTIVE);
         Self {
             logo: SvgButton {
                 svg_path: "logo.svg",
                 style: style
                     .clone()
                     .custom_svg_style(false)
-                    .width(62.0)
-                    .height(62.0)
+                    .width(constants::BAR_SIZE)
+                    .height(constants::BAR_SIZE)
                     .padding(0.0)
                     .on_press(SidebarMessage::Logo),
             },
@@ -136,7 +138,8 @@ impl<'a> Sidebar<'a> {
                 line(Line {
                     size: 32.0,
                     thick: 1.0,
-                    angle: 0.0.into()
+                    angle: 0.0.into(),
+                    color: None
                 }),
                 svg_button(self.script.svg_path, self.script.style.clone()),
                 svg_button(self.export.svg_path, self.export.style.clone()),
@@ -150,7 +153,7 @@ impl<'a> Sidebar<'a> {
         .style(|theme: &Theme| {
             let pallete = theme.extended_palette();
             container::Style::default()
-                .border(border::color(pallete.background.strong.color).width(1))
+                .border(border::color(pallete.background.weak.color).width(0.5))
         })
         .into()
     }

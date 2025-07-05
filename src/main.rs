@@ -1,8 +1,7 @@
-use iced::{time::{self, milliseconds}, widget::row, Alignment::Center, Element, Font, Task, Theme};
-use ui::{
-    primary::content::ContentMessage, Primary, PrimaryMessage, Sidebar, SidebarMessage
-};
+use iced::{widget::row, Alignment::Center, Element, Font, Size, Task, Theme};
+use ui::{Primary, PrimaryMessage, Sidebar, SidebarMessage};
 
+mod constants;
 mod ui;
 mod utils;
 
@@ -11,27 +10,20 @@ fn main() -> iced::Result {
         .theme(TableForge::theme)
         .font(include_bytes!("../resource/font.ttf").as_slice())
         .default_font(Font::MONOSPACE)
-        .subscription(|_| {
-            time::every(milliseconds(50))
-                .map(|_| Message::Primary(
-                    PrimaryMessage::Content(
-                        ContentMessage::Tick
-                    )
-                ))
-        })
+        .window_size(Size::new(1920.0, 1080.0))
         .run()
 }
 
 struct TableForge<'a> {
     theme: Theme,
     sidebar: Sidebar<'a>,
-    primary: Primary
+    primary: Primary<'a>,
 }
 
 #[derive(Clone, Debug)]
 enum Message {
     Sidebar(SidebarMessage),
-    Primary(PrimaryMessage)
+    Primary(PrimaryMessage),
 }
 
 impl<'a> TableForge<'a> {
