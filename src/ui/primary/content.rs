@@ -1,3 +1,7 @@
+pub mod diagram;
+pub mod explorer;
+pub mod property;
+
 use std::cell::RefCell;
 
 use iced::{

@@ -64,6 +64,11 @@ impl<'a, Message: Clone + 'a> SvgButtonStyle<'a, Message> {
         self
     }
 
+    pub fn none_color(mut self) -> Self {
+        self.svg_color = None;
+        self
+    }
+
     pub fn label(mut self, label: &'a str) -> Self {
         self.label = Some(label);
         self

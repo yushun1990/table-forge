@@ -1,5 +1,5 @@
 use iced::{
-    border,
+    border, padding,
     widget::{column, container, vertical_space},
     Alignment::Center,
     Element, Task, Theme,
@@ -85,7 +85,11 @@ impl<'a> Sidebar<'a> {
             },
             help: SvgButton {
                 svg_path: "sidebar/help.svg",
-                style: style.clone().on_press(SidebarMessage::Help).label("help"),
+                style: style
+                    .clone()
+                    .none_color()
+                    .on_press(SidebarMessage::Help)
+                    .label("help"),
             },
         }
     }
@@ -120,14 +124,10 @@ impl<'a> Sidebar<'a> {
 
                 Task::none()
             }
-            SidebarMessage::Help => {
-                self.inactive();
-                self.help.style.active();
-
-                Task::none()
-            }
+            SidebarMessage::Help => Task::none(),
         }
     }
+
     pub fn view(&self) -> Element<'a, SidebarMessage> {
         container(
             column![
@@ -148,6 +148,7 @@ impl<'a> Sidebar<'a> {
             ]
             .spacing(32)
             .width(62)
+            .padding(padding::bottom(20))
             .align_x(Center),
         )
         .style(|theme: &Theme| {
