@@ -1,7 +1,3 @@
-Below is a GitHub-style README for **TableForge**, tailored to your Rust/Iced-based PostgreSQL ERD tool with SqlDBM-inspired UI features. It follows GitHub's conventions with sections like Description, Installation, Usage, Features, Contributing, and License, while reflecting your project’s goals (performance < 50 ms for 500 tables, < 150 MB memory) and current design (tables with separate caches, undo/redo, DDL/JSON export). The tone is professional yet approachable, aligning with open-source community standards.
-
----
-
 # TableForge
 
 ![TableForge Logo](https://github.com/yushun1990/table-forge/blob/master/screen.png) <!-- Replace with actual logo URL once generated -->
