@@ -4,7 +4,7 @@ Below is a GitHub-style README for **TableForge**, tailored to your Rust/Iced-ba
 
 # TableForge
 
-![TableForge Logo](https://via.placeholder.com/150) <!-- Replace with actual logo URL once generated -->
+![TableForge Logo](https://github.com/yushun1990/table-forge/blob/master/screen.png) <!-- Replace with actual logo URL once generated -->
 
 A modern, high-performance Entity-Relationship Diagram (ERD) tool for PostgreSQL, built with Rust and Iced. Inspired by SqlDBM, TableForge offers an intuitive UI for designing and managing database schemas, with support for table relationships, grid snapping, and advanced features like undo/redo and DDL export.
 
